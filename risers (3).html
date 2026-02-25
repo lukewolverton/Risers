@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Risers — Morning Market Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#faf7f3;--white:#fff;--ink:#1a1208;--mid:#4a3828;--muted:#907868;
+  --rule:#e8ddd0;--cream:#f2ebe0;
+  --o1:#c8340a;--o2:#e06418;--o3:#f09428;--o4:#f5be44;
+  --dark:#14100a;--green:#1a8a50;--red:#c8340a;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.6;overflow-x:hidden}
+
+/* ── TICKER ── */
+.ticker{background:var(--dark);padding:7px 0;overflow:hidden;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.03em}
+.ticker-inner{display:flex;animation:scroll 55s linear infinite;white-space:nowrap;width:max-content}
+.t-item{display:inline-flex;align-items:center;gap:6px;padding:0 22px;border-right:1px solid #2e1a0a}
+.t-sym{color:var(--o4);font-weight:500}
+.t-px{color:#a08060}
+.up{color:#6fcf97}
+.dn{color:#e07060}
+@keyframes scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* ── HEADER ── */
+header{background:var(--white);border-bottom:2px solid var(--ink);position:sticky;top:0;z-index:100;box-shadow:0 1px 10px rgba(26,18,8,.07)}
+.hdr-inner{display:flex;align-items:center;justify-content:space-between;padding:10px 40px;border-bottom:1px solid var(--rule)}
+.logo-wrap{display:flex;align-items:center;gap:12px;text-decoration:none}
+.logo-txt{display:flex;flex-direction:column;line-height:1}
+.logo-name{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--ink);letter-spacing:-.3px}
+.logo-name span{background:linear-gradient(90deg,var(--o1),var(--o3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.logo-sub{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:3px}
+.hdr-right{text-align:right;font-family:'DM Mono',monospace}
+.hdr-date{font-size:12px;color:var(--ink);font-weight:500;margin-bottom:2px}
+.live-dot{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)}
+.live-dot::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── INTRO STRIP ── */
+.intro{background:linear-gradient(135deg,var(--dark) 0%,#2a1408 60%,#381c0a 100%);padding:14px 40px;border-bottom:3px solid var(--o1)}
+.intro-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.intro-text{font-size:13px;color:#9a7858;font-weight:300;line-height:1.55}
+.intro-text strong{color:#e8d4b8;font-weight:500}
+.intro-mkt{display:flex;gap:20px;flex-shrink:0}
+.mkt-box{text-align:right}
+.mkt-lbl{font-family:'DM Mono',monospace;font-size:9px;color:#5a4030;text-transform:uppercase;letter-spacing:.1em}
+.mkt-val{font-family:'DM Mono',monospace;font-size:17px;color:#e8d4b8;font-weight:500;line-height:1.1}
+.mkt-chg{font-family:'DM Mono',monospace;font-size:11px;font-weight:500}
+
+/* ── MAIN ── */
+main{max-width:900px;margin:0 auto;padding:0 40px 60px}
+.sec-hdr{display:flex;align-items:center;gap:10px;padding:26px 0 0;margin-bottom:0}
+.sec-dot{width:7px;height:7px;border-radius:50%;background:linear-gradient(135deg,var(--o1),var(--o3));flex-shrink:0}
+.sec-title{font-family:'Playfair Display',serif;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.sec-line{flex:1;height:1px;background:var(--rule)}
+.sec-time{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)}
+
+/* ── LEAD STORY ── */
+.lead{padding:24px 0;border-bottom:2px solid var(--ink);cursor:pointer}
+.lead:hover .lead-hl{color:var(--o2)}
+.story-row{display:flex;align-items:flex-start;justify-content:space-between;gap:24px}
+.story-meta{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.s-tag{font-family:'DM Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--o2)}
+.s-sep{color:var(--rule)}
+.s-time{font-family:'DM Mono',monospace;font-size:9.5px}
+.s-time.live{color:var(--o1);font-weight:600}
+.lead-hl{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;line-height:1.22;color:var(--ink);margin-bottom:9px;transition:color .15s}
+.lead-deck{font-size:14px;line-height:1.7;color:var(--mid);font-weight:300;max-width:620px}
+.px-badge{text-align:right;flex-shrink:0;min-width:80px}
+.px-sym{font-family:'DM Mono',monospace;font-size:9.5px;color:var(--muted);margin-bottom:3px}
+.px-val{font-family:'DM Mono',monospace;font-size:21px;font-weight:500;color:var(--ink);line-height:1}
+.px-chg{font-family:'DM Mono',monospace;font-size:11.5px;font-weight:500;margin-top:3px}
+.px-chg.up{color:var(--green)}.px-chg.dn{color:var(--o1)}
+.read-link{display:inline-flex;align-items:center;gap:5px;margin-top:13px;font-family:'DM Mono',monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--o1);font-weight:600;border-bottom:1px solid var(--o3);padding-bottom:1px}
+
+/* ── REGULAR STORY ── */
+.story{display:flex;align-items:flex-start;gap:18px;padding:17px 0;border-bottom:1px solid var(--rule);cursor:pointer;transition:opacity .15s}
+.story:hover{opacity:.85}
+.story:hover .s-hl{color:var(--o2)}
+.s-hl{font-family:'Playfair Display',serif;font-size:18px;font-weight:600;line-height:1.28;color:var(--ink);margin-bottom:5px;transition:color .15s}
+.s-deck{font-size:12.5px;color:var(--muted);line-height:1.6;font-weight:300}
+.s-body{flex:1}
+
+/* ── NL STRIP ── */
+.nl{margin-top:36px;padding:20px 24px;background:linear-gradient(90deg,var(--o1),var(--o2) 55%,var(--o3));display:flex;align-items:center;justify-content:space-between;gap:16px}
+.nl h4{font-family:'Playfair Display',serif;font-size:15px;font-weight:600;color:#fff;margin-bottom:1px}
+.nl p{font-size:11.5px;color:rgba(255,255,255,.7)}
+.nl-form{display:flex;flex-shrink:0}
+.nl-form input{padding:8px 12px;border:1.5px solid rgba(255,255,255,.4);border-right:none;font-family:'DM Sans',sans-serif;font-size:12.5px;width:210px;background:rgba(255,255,255,.15);color:#fff;outline:none}
+.nl-form input::placeholder{color:rgba(255,255,255,.55)}
+.nl-form button{padding:8px 16px;background:var(--dark);color:var(--o4);border:none;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;cursor:pointer;white-space:nowrap}
+.nl-form button:hover{background:#000}
+
+/* ── FOOTER ── */
+footer{background:var(--dark);padding:30px 40px 18px}
+.ft-inner{max-width:900px;margin:0 auto}
+.ft-top{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:20px;border-bottom:1px solid #2a1a0a;gap:32px}
+.ft-logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--o4)}
+.ft-logo span{color:var(--o2)}
+.ft-tag{font-size:11px;color:#3a2818;margin-top:4px}
+.ft-links{display:flex;gap:36px}
+.fc h5{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#3a2818;margin-bottom:9px}
+.fc a{display:block;color:#4a3828;font-size:12px;text-decoration:none;margin-bottom:5px;transition:color .15s}
+.fc a:hover{color:var(--o3)}
+.ft-bot{display:flex;justify-content:space-between;padding-top:14px;font-family:'DM Mono',monospace;font-size:9.5px;color:#2e1e10}
+
+/* ── MODAL ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(14,9,4,.78);z-index:999;align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto}
+.overlay.open{display:flex}
+.modal{background:var(--white);max-width:700px;width:100%;border-radius:2px;overflow:hidden;position:relative;animation:mIn .22s ease}
+@keyframes mIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.m-close{position:absolute;top:14px;right:18px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);line-height:1;z-index:2}
+.m-close:hover{color:var(--o1)}
+.m-head{padding:26px 36px 16px;border-bottom:2px solid var(--ink)}
+.m-tag{font-family:'DM Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--o2);margin-bottom:8px}
+.m-title{font-family:'Playfair Display',serif;font-size:23px;font-weight:700;line-height:1.25;color:var(--ink);margin-bottom:9px}
+.m-meta{font-family:'DM Mono',monospace;font-size:10.5px;color:var(--muted);display:flex;gap:8px}
+.m-meta .by{color:var(--o3)}
+.m-body{padding:22px 36px 32px;font-size:14.5px;line-height:1.8;color:var(--mid)}
+.m-body p{margin-bottom:15px}
+.m-disc{padding:11px 36px;background:var(--cream);border-top:1px solid var(--rule);font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);line-height:1.5}
+.loading{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;padding:16px 0}
+.dots{display:inline-flex;gap:4px}
+.dots span{width:7px;height:7px;border-radius:50%;background:var(--o2);display:inline-block;animation:dp 1.2s ease-in-out infinite}
+.dots span:nth-child(2){animation-delay:.2s}
+.dots span:nth-child(3){animation-delay:.4s}
+@keyframes dp{0%,80%,100%{opacity:.3;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+
+@media(max-width:640px){
+  .hdr-inner,.intro-inner{padding-left:20px;padding-right:20px;flex-direction:column;align-items:flex-start;gap:10px}
+  main{padding-left:20px;padding-right:20px}
+  .intro-mkt{display:none}
+  .story-row{flex-direction:column}
+  .px-badge{text-align:left}
+  .nl{flex-direction:column}
+  footer{padding-left:20px;padding-right:20px}
+}
+</style>
+</head>
+<body>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner" id="tickerInner"></div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="hdr-inner">
+    <a href="#" class="logo-wrap">
+      <!-- SVG Logo: sun rising with clean horizon clip + zigzag arrow -->
+      <svg width="50" height="50" viewBox="0 0 80 80" fill="none">
+        <defs>
+          <linearGradient id="sg" x1=".5" y1="0" x2=".5" y2="1">
+            <stop offset="0%" stop-color="#f5be44"/>
+            <stop offset="50%" stop-color="#f09428"/>
+            <stop offset="100%" stop-color="#c8340a"/>
+          </linearGradient>
+          <linearGradient id="ag" x1="0" y1=".5" x2="1" y2=".5">
+            <stop offset="0%" stop-color="#c8340a"/>
+            <stop offset="60%" stop-color="#e06418"/>
+            <stop offset="100%" stop-color="#f5be44"/>
+          </linearGradient>
+          <linearGradient id="rg" x1=".5" y1="1" x2=".5" y2="0">
+            <stop offset="0%" stop-color="#e06418" stop-opacity=".85"/>
+            <stop offset="100%" stop-color="#f5be44" stop-opacity=".3"/>
+          </linearGradient>
+          <!-- Clip rays + sun to horizon line -->
+          <clipPath id="hc"><rect x="0" y="0" width="80" height="46"/></clipPath>
+        </defs>
+        <!-- Rays clipped above horizon -->
+        <g clip-path="url(#hc)">
+          <line x1="40" y1="14" x2="40" y2="4"  stroke="url(#rg)" stroke-width="4"   stroke-linecap="round"/>
+          <line x1="57" y1="20" x2="64" y2="11" stroke="url(#rg)" stroke-width="3.5" stroke-linecap="round"/>
+          <line x1="23" y1="20" x2="16" y2="11" stroke="url(#rg)" stroke-width="3.5" stroke-linecap="round"/>
+          <line x1="65" y1="34" x2="73" y2="29" stroke="url(#rg)" stroke-width="3"   stroke-linecap="round"/>
+          <line x1="15" y1="34" x2="7"  y2="29" stroke="url(#rg)" stroke-width="3"   stroke-linecap="round"/>
+          <!-- Sun circle, bottom edge sits on horizon -->
+          <circle cx="40" cy="46" r="23" fill="url(#sg)"/>
+        </g>
+        <!-- Clean horizon line -->
+        <line x1="4" y1="46" x2="76" y2="46" stroke="#e06418" stroke-width="1.5" stroke-linecap="round" opacity=".35"/>
+        <!-- Rising chart arrow cutting through -->
+        <path d="M 5 70 L 20 57 L 30 64 L 44 48 L 55 55 L 72 30"
+              stroke="url(#ag)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <polygon points="72,30 63,28 67,38" fill="#f5be44"/>
+      </svg>
+      <div class="logo-txt">
+        <div class="logo-name">Risers<span>.</span></div>
+        <div class="logo-sub">Morning Market Intelligence</div>
+      </div>
+    </a>
+    <div class="hdr-right">
+      <div class="hdr-date" id="todayDate"></div>
+      <div class="live-dot" id="liveLabel">Markets Live</div>
+    </div>
+  </div>
+</header>
+
+<!-- INTRO STRIP -->
+<div class="intro">
+  <div class="intro-inner">
+    <div class="intro-text">
+      <strong>The market, in plain English.</strong> Risers is built for young people tight on time — 5–6 stories, written simply, covering what actually moved the market today. Click any story to read the full breakdown.
+    </div>
+    <div class="intro-mkt">
+      <div class="mkt-box">
+        <div class="mkt-lbl">S&P 500</div>
+        <div class="mkt-val" id="sp500-val">5,944</div>
+        <div class="mkt-chg up" id="sp500-chg">▲ +0.91%</div>
+      </div>
+      <div class="mkt-box">
+        <div class="mkt-lbl">Nasdaq</div>
+        <div class="mkt-val" id="ndx-val">22,847</div>
+        <div class="mkt-chg up" id="ndx-chg">▲ +1.38%</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main>
+  <div class="sec-hdr">
+    <div class="sec-dot"></div>
+    <span class="sec-title">Today's Market Stories</span>
+    <div class="sec-line"></div>
+    <span class="sec-time" id="updateTime"></span>
+  </div>
+
+  <!-- LEAD -->
+  <div class="lead" onclick="openArticle('nvda')">
+    <div class="story-row">
+      <div style="flex:1">
+        <div class="story-meta">
+          <span class="s-tag">Breaking · Earnings</span>
+          <span class="s-sep">·</span>
+          <span class="s-time live">● LIVE</span>
+        </div>
+        <div class="lead-hl">Nvidia Reports After the Bell — The Entire Market Is Watching</div>
+        <div class="lead-deck">Wall Street rallied Wednesday as traders positioned ahead of Nvidia's most-anticipated earnings report of the quarter. Shares rose 2.3% into the print. A beat could confirm AI capex is intact; a miss could rattle the entire tech sector.</div>
+        <div class="read-link">Read full story →</div>
+      </div>
+      <div class="px-badge">
+        <div class="px-sym">NVDA</div>
+        <div class="px-val" id="px-NVDA">134.00</div>
+        <div class="px-chg up" id="chg-NVDA">▲ +2.31%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STORIES -->
+  <div class="story" onclick="openArticle('cava')">
+    <div class="s-body">
+      <div class="story-meta"><span class="s-tag">Restaurants · Earnings</span><span class="s-sep">·</span><span class="s-time">8:34 AM</span></div>
+      <div class="s-hl">Cava Surges 9% After Blowout Quarter and Raised Outlook</div>
+      <div class="s-deck">Same-store sales guidance of 3–5% for FY26 topped every Wall Street estimate, rewarding investors who held through the recent consumer discretionary selloff.</div>
+    </div>
+    <div class="px-badge">
+      <div class="px-sym">CAVA</div>
+      <div class="px-val" id="px-CAVA">118.60</div>
+      <div class="px-chg up" id="chg-CAVA">▲ +9.1%</div>
+    </div>
+  </div>
+
+  <div class="story" onclick="openArticle('fslr')">
+    <div class="s-body">
+      <div class="story-meta"><span class="s-tag">Clean Energy · Earnings</span><span class="s-sep">·</span><span class="s-time">9:02 AM</span></div>
+      <div class="s-hl">First Solar Crashes 15% as Guidance Misses in a "Rapidly Evolving" Environment</div>
+      <div class="s-deck">The solar giant's full-year revenue guidance fell short of consensus by a wide margin. Management blamed policy uncertainty and supply chain headwinds, rattling investors already nervous about IRA subsidy risk.</div>
+    </div>
+    <div class="px-badge">
+      <div class="px-sym">FSLR</div>
+      <div class="px-val" id="px-FSLR">142.30</div>
+      <div class="px-chg dn" id="chg-FSLR">▼ −14.8%</div>
+    </div>
+  </div>
+
+  <div class="story" onclick="openArticle('pypl')">
+    <div class="s-body">
+      <div class="story-meta"><span class="s-tag">Fintech · M&amp;A</span><span class="s-sep">·</span><span class="s-time">9:45 AM</span></div>
+      <div class="s-hl">PayPal Jumps 7% as Stripe Reportedly Eyes Acquisition</div>
+      <div class="s-deck">Bloomberg reported that private payments giant Stripe is exploring a deal for all or part of PayPal — which would be one of the largest fintech M&A events in history.</div>
+    </div>
+    <div class="px-badge">
+      <div class="px-sym">PYPL</div>
+      <div class="px-val" id="px-PYPL">76.40</div>
+      <div class="px-chg up" id="chg-PYPL">▲ +7.2%</div>
+    </div>
+  </div>
+
+  <div class="story" onclick="openArticle('tariffs')">
+    <div class="s-body">
+      <div class="story-meta"><span class="s-tag">Macro · Policy</span><span class="s-sep">·</span><span class="s-time">7:58 AM</span></div>
+      <div class="s-hl">Trump Raises Global Tariffs to 15% After Supreme Court Strikes Down Prior Measures</div>
+      <div class="s-deck">The president announced the new level via Truth Social, effective immediately. The dollar strengthened and gold extended its 2026 rally above $2,900 on the news.</div>
+    </div>
+    <div class="px-badge">
+      <div class="px-sym">GOLD</div>
+      <div class="px-val" id="px-GOLD">2,938</div>
+      <div class="px-chg up" id="chg-GOLD">▲ +0.82%</div>
+    </div>
+  </div>
+
+  <div class="story" onclick="openArticle('amd')">
+    <div class="s-body">
+      <div class="story-meta"><span class="s-tag">Semiconductors · AI</span><span class="s-sep">·</span><span class="s-time">10:15 AM</span></div>
+      <div class="s-hl">AMD's Quiet Win: Meta's $6GW GPU Deal Is a Wake-Up Call for Nvidia</div>
+      <div class="s-deck">Meta's multiyear agreement to deploy 6 gigawatts of AMD chips across its AI data centers sent AMD surging 9% Tuesday. The stock extended gains Wednesday — sending a clear message to Nvidia ahead of tonight's print.</div>
+    </div>
+    <div class="px-badge">
+      <div class="px-sym">AMD</div>
+      <div class="px-val" id="px-AMD">112.80</div>
+      <div class="px-chg up" id="chg-AMD">▲ +1.02%</div>
+    </div>
+  </div>
+
+  <!-- NL STRIP -->
+  <div class="nl">
+    <div>
+      <h4>Get the Risers Brief — 6 AM, every market day.</h4>
+      <p>Free. No noise. Just the stories that moved the market.</p>
+    </div>
+    <div class="nl-form">
+      <input type="email" placeholder="your@email.com">
+      <button>Subscribe Free</button>
+    </div>
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-inner">
+    <div class="ft-top">
+      <div>
+        <div class="ft-logo">Risers<span>.</span></div>
+        <div class="ft-tag">Morning market intelligence for young investors.</div>
+      </div>
+      <div class="ft-links">
+        <div class="fc"><h5>Coverage</h5><a href="#">Markets</a><a href="#">Economy</a><a href="#">Equities</a><a href="#">Crypto</a></div>
+        <div class="fc"><h5>Company</h5><a href="#">About</a><a href="#">Newsletter</a><a href="#">Contact</a></div>
+        <div class="fc"><h5>Legal</h5><a href="#">Terms</a><a href="#">Privacy</a><a href="#">Disclaimer</a></div>
+      </div>
+    </div>
+    <div class="ft-bot">
+      <span>© 2026 Risers Media.</span>
+      <span>AI-generated content for informational purposes only. Not financial advice.</span>
+    </div>
+  </div>
+</footer>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <button class="m-close" onclick="closeModal()">✕</button>
+    <div class="m-head">
+      <div class="m-tag" id="m-tag"></div>
+      <div class="m-title" id="m-title"></div>
+      <div class="m-meta"><span class="by">Risers AI Desk</span><span>·</span><span id="m-date">Feb 25, 2026</span><span>·</span><span>AI-generated</span></div>
+    </div>
+    <div class="m-body" id="m-body">
+      <div class="loading"><div class="dots"><span></span><span></span><span></span></div><span>Writing article…</span></div>
+    </div>
+    <div class="m-disc">AI-generated for informational purposes only. Not financial advice. Always do your own research.</div>
+  </div>
+</div>
+
+<script>
+// ── PRICES ────────────────────────────────────────────────────
+const prices = {
+  NVDA:{ p:134.00, c:2.31 }, CAVA:{ p:118.60, c:9.10 },
+  FSLR:{ p:142.30, c:-14.8}, PYPL:{ p:76.40,  c:7.20 },
+  AMD: { p:112.80, c:1.02 }, GOLD:{ p:2938,    c:0.82 },
+  SPY: { p:589.75, c:0.91 }, QQQ: { p:510.50,  c:1.38 },
+  AAPL:{ p:226.50, c:2.20 }, MSFT:{ p:393.25,  c:2.19 },
+  TSLA:{ p:330.50, c:2.40 }, META:{ p:650.75,  c:0.82 },
+  AMZN:{ p:208.40, c:1.10 }, BTC: { p:89100,   c:1.40 },
+};
+
+const VOLATILE = { BTC:90, GOLD:4, AAPL:1.5, MSFT:1.5, TSLA:3, META:2, AMZN:1.5 };
+
+// Build ticker HTML (double for seamless loop)
+function buildTicker() {
+  const items = Object.entries(prices).map(([sym,d]) => {
+    const up = d.c >= 0;
+    return `<span class="t-item">
+      <span class="t-sym">${sym}</span>
+      <span class="t-px" id="tp-${sym}">${sym==='BTC'||sym==='GOLD'?d.p.toLocaleString():d.p.toFixed(2)}</span>
+      <span class="${up?'up':'dn'}" id="tc-${sym}">${up?'▲':'▼'} ${up?'+':''}${d.c.toFixed(2)}%</span>
+    </span>`;
+  }).join('');
+  document.getElementById('tickerInner').innerHTML = items + items;
+}
+
+function updateDisplays() {
+  // Ticker
+  Object.entries(prices).forEach(([sym,d]) => {
+    const pEl = document.getElementById('tp-'+sym);
+    const cEl = document.getElementById('tc-'+sym);
+    if (pEl) pEl.textContent = sym==='BTC'||sym==='GOLD' ? Math.round(d.p).toLocaleString() : d.p.toFixed(2);
+    if (cEl) {
+      const up = d.c >= 0;
+      cEl.className = up ? 'up' : 'dn';
+      cEl.textContent = `${up?'▲':'▼'} ${up?'+':''}${d.c.toFixed(2)}%`;
+    }
+  });
+
+  // Story price badges
+  ['NVDA','CAVA','FSLR','PYPL','AMD','GOLD'].forEach(sym => {
+    const d = prices[sym];
+    const pEl = document.getElementById('px-'+sym);
+    const cEl = document.getElementById('chg-'+sym);
+    if (pEl) pEl.textContent = sym==='GOLD' ? Math.round(d.p).toLocaleString() : d.p.toFixed(2);
+    if (cEl) {
+      const up = d.c >= 0;
+      cEl.className = 'px-chg '+(up?'up':'dn');
+      cEl.textContent = `${up?'▲':'▼'} ${up?'+':''}${d.c.toFixed(2)}%`;
+    }
+  });
+
+  // Index panels
+  const spy = prices.SPY, qqq = prices.QQQ;
+  document.getElementById('sp500-val').textContent = Math.round(spy.p * 10.08).toLocaleString();
+  document.getElementById('ndx-val').textContent   = Math.round(qqq.p * 44.6).toLocaleString();
+  const spChgEl = document.getElementById('sp500-chg');
+  spChgEl.className = 'mkt-chg '+(spy.c>=0?'up':'dn');
+  spChgEl.textContent = `${spy.c>=0?'▲':'▼'} ${spy.c>=0?'+':''}${spy.c.toFixed(2)}%`;
+  const nChgEl = document.getElementById('ndx-chg');
+  nChgEl.className = 'mkt-chg '+(qqq.c>=0?'up':'dn');
+  nChgEl.textContent = `${qqq.c>=0?'▲':'▼'} ${qqq.c>=0?'+':''}${qqq.c.toFixed(2)}%`;
+
+  // Update time
+  document.getElementById('updateTime').textContent = 'Updated '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+}
+
+// Live price simulation every 8s
+setInterval(() => {
+  Object.entries(prices).forEach(([sym, d]) => {
+    const vol = VOLATILE[sym] || (d.p > 500 ? 2 : d.p > 100 ? 1 : 0.4);
+    prices[sym].p = Math.max(0.01, d.p + (Math.random()-.49)*vol);
+    prices[sym].c = d.c + (Math.random()-.49)*0.07;
+  });
+  updateDisplays();
+}, 8000);
+
+// ── DATE ──────────────────────────────────────────────────────
+const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const now = new Date();
+document.getElementById('todayDate').textContent =
+  days[now.getDay()]+', '+months[now.getMonth()]+' '+now.getDate()+', '+now.getFullYear();
+
+// ── ARTICLES ──────────────────────────────────────────────────
+const articles = {
+  nvda:{
+    tag:'Breaking · Earnings',
+    title:'Nvidia Reports After the Bell — The Entire Market Is Watching',
+    prompt:`You are a financial journalist for Risers, a market news outlet for young, time-poor readers. Write a sharp 4-paragraph news article in plain prose — no headers, no bullet points, no markdown — about Nvidia's Q4 FY2026 earnings report due after market close today, February 25, 2026.
+
+Key facts: NVDA at $134, up 2.3%. S&P 500 up 0.9%. Nasdaq up 1.3%. Analysts expect strong data center revenue. CEO Jensen Huang's next platform is called "Vera Rubin." Salesforce and Snowflake also report tonight.
+
+Tone: WSJ/Bloomberg quality. Start with market setup, cover what analysts expect, explain the AI capex debate simply, end with what a beat vs miss means.`
+  },
+  cava:{
+    tag:'Restaurants · Earnings',
+    title:'Cava Surges 9% After Blowout Quarter and Raised Outlook',
+    prompt:`You are a financial journalist for Risers, a market news outlet for young readers. Write a sharp 3-paragraph news article in plain prose — no headers, no bullet points, no markdown — about Cava Group (CAVA) surging 9% on February 25, 2026.
+
+Key facts: CAVA at $118.60, up 9.1%. Q4 same-store sales beat estimates. FY26 guidance of 3–5% same-store sales growth topped consensus. Strong unit economics and new restaurant openings drove results.
+
+Tone: Bloomberg brief style. Cover results, growth drivers, guidance, and investor reaction. Accessible language for young readers.`
+  },
+  fslr:{
+    tag:'Clean Energy · Earnings',
+    title:'First Solar Crashes 15% as Guidance Misses in a "Rapidly Evolving" Environment',
+    prompt:`You are a financial journalist for Risers, a market news outlet for young readers. Write a sharp 3-paragraph news article in plain prose — no headers, no bullet points, no markdown — about First Solar (FSLR) crashing 15% on February 25, 2026.
+
+Key facts: FSLR at $142.30, down ~15%. Full-year revenue guidance missed consensus badly. Management used the phrase "rapidly evolving environment." IRA subsidy risk and solar tariff policy are key concerns.
+
+Write like Reuters. Cover the miss, explain IRA/tariff headwinds simply, and what it means for clean energy stocks.`
+  },
+  pypl:{
+    tag:'Fintech · M&A',
+    title:'PayPal Jumps 7% as Stripe Reportedly Eyes Acquisition',
+    prompt:`You are a financial journalist for Risers, a market news outlet for young readers. Write a sharp 3-paragraph news article in plain prose — no headers, no bullet points, no markdown — about PayPal (PYPL) jumping 7% on February 25, 2026.
+
+Key facts: PYPL at $76.40, up 7.2%. Bloomberg reported Stripe (private) is exploring acquiring all or part of PayPal. Both companies declined to comment. This is a second-day rally following a Monday report about separate takeover interest.
+
+Explain what both companies do simply, cover the strategic logic and market reaction. Written for young adults.`
+  },
+  tariffs:{
+    tag:'Macro · Policy',
+    title:'Trump Raises Global Tariffs to 15% After Supreme Court Strikes Down Prior Measures',
+    prompt:`You are a financial journalist for Risers, a market news outlet for young readers. Write a sharp 4-paragraph news article in plain prose — no headers, no bullet points, no markdown — about Trump raising global tariffs to 15% on February 25, 2026.
+
+Key facts: Trump announced 15% blanket global tariff via Truth Social effective immediately. Supreme Court had struck down prior tariff agenda under Section 122 of the Trade Act. More tariffs threatened. Gold above $2,938. Dollar index up 0.4%. Markets still rallying — SOTU last night didn't signal immediate escalation.
+
+Explain tariffs simply for young readers. Cover the announcement, legal context briefly, market reaction, and what to watch next.`
+  },
+  amd:{
+    tag:'Semiconductors · AI',
+    title:"AMD's Quiet Win: Meta's $6GW GPU Deal Is a Wake-Up Call for Nvidia",
+    prompt:`You are a financial journalist for Risers, a market news outlet for young readers. Write a sharp 3-paragraph news article in plain prose — no headers, no bullet points, no markdown — about AMD extending its rally on February 25, 2026.
+
+Key facts: AMD at $112.80, extending Tuesday's 9% surge. Meta announced multiyear deal to deploy 6 gigawatts of AMD GPUs in AI data centers. Hyperscalers have historically depended almost entirely on Nvidia. Nvidia reports earnings tonight.
+
+Explain what GPUs are simply, cover competitive implications for Nvidia, explain "6 gigawatts" in plain terms. Keep accessible and tight.`
+  }
+};
+
+function openArticle(id) {
+  const a = articles[id];
+  if(!a) return;
+  document.getElementById('m-tag').textContent   = a.tag;
+  document.getElementById('m-title').textContent = a.title;
+  document.getElementById('m-body').innerHTML    = '<div class="loading"><div class="dots"><span></span><span></span><span></span></div><span>Writing article with AI…</span></div>';
+  document.getElementById('overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  fetch('https://api.anthropic.com/v1/messages', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:1000,
+      system:'You are a concise financial journalist. Write only plain prose paragraphs — absolutely no markdown, no headers, no asterisks, no bullet points. Write for young adults who want clear, fast financial news.',
+      messages:[{role:'user', content:a.prompt}]
+    })
+  })
+  .then(r=>r.json())
+  .then(data=>{
+    const text = data.content?.[0]?.text || 'Unable to generate article at this time.';
+    document.getElementById('m-body').innerHTML = text.trim().split(/\n\n+/).map(p=>`<p>${p.trim()}</p>`).join('');
+  })
+  .catch(()=>{
+    document.getElementById('m-body').innerHTML = '<p style="color:var(--muted)">Unable to load article. This feature requires the page to be opened through Claude.ai or a server with API access configured.</p>';
+  });
+}
+
+function closeModal(){
+  document.getElementById('overlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+
+// Init
+buildTicker();
+updateDisplays();
+</script>
+</body>
+</html>
