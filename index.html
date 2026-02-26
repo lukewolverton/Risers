@@ -370,81 +370,60 @@ footer{background:var(--dark);padding:30px 40px 18px}
 
 <script>
 // ── PRICES ────────────────────────────────────────────────────
-const prices = {
-  NVDA:{ p:134.00, c:2.31 }, CAVA:{ p:118.60, c:9.10 },
-  FSLR:{ p:142.30, c:-14.8}, PYPL:{ p:76.40,  c:7.20 },
-  AMD: { p:112.80, c:1.02 }, GOLD:{ p:2938,    c:0.82 },
-  SPY: { p:589.75, c:0.91 }, QQQ: { p:510.50,  c:1.38 },
-  AAPL:{ p:226.50, c:2.20 }, MSFT:{ p:393.25,  c:2.19 },
-  TSLA:{ p:330.50, c:2.40 }, META:{ p:650.75,  c:0.82 },
-  AMZN:{ p:208.40, c:1.10 }, BTC: { p:89100,   c:1.40 },
-};
+const STOCK_API = "https://api.marketstack.com/v1/intraday";
+const STOCK_KEY = "YOUR_MARKETSTACK_KEY";
 
-const VOLATILE = { BTC:90, GOLD:4, AAPL:1.5, MSFT:1.5, TSLA:3, META:2, AMZN:1.5 };
+const INDEX_API = "https://api.indices-api.com/latest";
+const INDEX_KEY = "YOUR_INDICES_API_KEY";
 
-// Build ticker HTML (double for seamless loop)
-function buildTicker() {
-  const items = Object.entries(prices).map(([sym,d]) => {
-    const up = d.c >= 0;
-    return `<span class="t-item">
-      <span class="t-sym">${sym}</span>
-      <span class="t-px" id="tp-${sym}">${sym==='BTC'||sym==='GOLD'?d.p.toLocaleString():d.p.toFixed(2)}</span>
-      <span class="${up?'up':'dn'}" id="tc-${sym}">${up?'▲':'▼'} ${up?'+':''}${d.c.toFixed(2)}%</span>
-    </span>`;
-  }).join('');
-  document.getElementById('tickerInner').innerHTML = items + items;
+const SYMBOLS = ["NVDA","CAVA","FSLR","PYPL","AMD"];
+
+async function fetchStockPrices() {
+  const url = `${STOCK_API}?access_key=${STOCK_KEY}&symbols=${SYMBOLS.join(",")}&interval=1min`;
+
+  const res = await fetch(url);
+  const data = await res.json();
+
+  data.data.forEach(stock => {
+    const price = stock.last;
+    const change = ((stock.last - stock.open) / stock.open) * 100;
+
+    updateStockDisplay(stock.symbol, price, change);
+  });
 }
 
-function updateDisplays() {
-  // Ticker
-  Object.entries(prices).forEach(([sym,d]) => {
-    const pEl = document.getElementById('tp-'+sym);
-    const cEl = document.getElementById('tc-'+sym);
-    if (pEl) pEl.textContent = sym==='BTC'||sym==='GOLD' ? Math.round(d.p).toLocaleString() : d.p.toFixed(2);
-    if (cEl) {
-      const up = d.c >= 0;
-      cEl.className = up ? 'up' : 'dn';
-      cEl.textContent = `${up?'▲':'▼'} ${up?'+':''}${d.c.toFixed(2)}%`;
-    }
-  });
+async function fetchIndices() {
+  const res = await fetch(`${INDEX_API}?api_key=${INDEX_KEY}&symbols=SPX,IXIC`);
+  const data = await res.json();
 
-  // Story price badges
-  ['NVDA','CAVA','FSLR','PYPL','AMD','GOLD'].forEach(sym => {
-    const d = prices[sym];
-    const pEl = document.getElementById('px-'+sym);
-    const cEl = document.getElementById('chg-'+sym);
-    if (pEl) pEl.textContent = sym==='GOLD' ? Math.round(d.p).toLocaleString() : d.p.toFixed(2);
-    if (cEl) {
-      const up = d.c >= 0;
-      cEl.className = 'px-chg '+(up?'up':'dn');
-      cEl.textContent = `${up?'▲':'▼'} ${up?'+':''}${d.c.toFixed(2)}%`;
-    }
-  });
+  document.getElementById("sp500-val").textContent =
+    data.SPX.price.toLocaleString();
 
-  // Index panels
-  const spy = prices.SPY, qqq = prices.QQQ;
-  document.getElementById('sp500-val').textContent = Math.round(spy.p * 10.08).toLocaleString();
-  document.getElementById('ndx-val').textContent   = Math.round(qqq.p * 44.6).toLocaleString();
-  const spChgEl = document.getElementById('sp500-chg');
-  spChgEl.className = 'mkt-chg '+(spy.c>=0?'up':'dn');
-  spChgEl.textContent = `${spy.c>=0?'▲':'▼'} ${spy.c>=0?'+':''}${spy.c.toFixed(2)}%`;
-  const nChgEl = document.getElementById('ndx-chg');
-  nChgEl.className = 'mkt-chg '+(qqq.c>=0?'up':'dn');
-  nChgEl.textContent = `${qqq.c>=0?'▲':'▼'} ${qqq.c>=0?'+':''}${qqq.c.toFixed(2)}%`;
-
-  // Update time
-  document.getElementById('updateTime').textContent = 'Updated '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  document.getElementById("ndx-val").textContent =
+    data.IXIC.price.toLocaleString();
 }
 
-// Live price simulation every 8s
-setInterval(() => {
-  Object.entries(prices).forEach(([sym, d]) => {
-    const vol = VOLATILE[sym] || (d.p > 500 ? 2 : d.p > 100 ? 1 : 0.4);
-    prices[sym].p = Math.max(0.01, d.p + (Math.random()-.49)*vol);
-    prices[sym].c = d.c + (Math.random()-.49)*0.07;
-  });
-  updateDisplays();
-}, 8000);
+function updateStockDisplay(sym, price, change) {
+  const pEl = document.getElementById("px-"+sym);
+  const cEl = document.getElementById("chg-"+sym);
+
+  if (!pEl || !cEl) return;
+
+  pEl.textContent = price.toFixed(2);
+
+  const up = change >= 0;
+  cEl.className = "px-chg " + (up ? "up" : "dn");
+  cEl.textContent =
+    `${up ? "▲ +" : "▼ "}${change.toFixed(2)}%`;
+}
+
+async function updateAll() {
+  await fetchStockPrices();
+  await fetchIndices();
+}
+
+updateAll();
+setInterval(updateAll, 60000);
 
 // ── DATE ──────────────────────────────────────────────────────
 const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
